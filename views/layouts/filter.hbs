@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div style="text-align:center">
+         <form action="/filter" method="post">
+        <p>Age between</p>
+        <input type="number" name="lowerage" id="">
+        <p>and</p>
+        <input type="number" name="higherage" id="">
+        <br><br>
+
+                
+        <label for="">Education</label>
+        <select name="Education" ><br><br>
+            <option value="choose">choose</option>
+            <option value="btech" id="btech">Btech</option>
+            <option value="mtech" id="mtech">Mtech</option>
+            <option value="diploma" id="diploma">Diploma</option>
+            <option value="predegree" id="predegree">Predegree</option>
+        </select><br><br>
+
+         <label for="">Family type</label>
+         <select name="familytype" >
+                <option value="please select">Please select</option>
+                <option value="joint-family" id="joint-family">Joint Family</option>
+                <option value="nuclear-family" id="nuclear-family">Nuclear Family</option>
+         </select><br><br>
+
+        <label for="">Family Status</label>
+        <select name="familystatus" id="">
+            <option value="please select">Please select</option>
+            <option value="lower-income" id="lower-income">Lower income</option>
+            <option value="middle-class" id="middle-class">Middle class</option>
+            <option value="upper-middle" id="upper-middle">Upper middle class</option>
+            <option value="rich">Rich</option>
+        </select><br><br>
+
+        <label for="">bodytype</label>
+        <select name="bodytype" id="">
+            <option value="please select">Please select</option>
+            <option value="Athletic" id="Athletic">Athletic</option>
+            <option value="Average" id="Average">Average</option>
+            <option value="Heavy" id="Heavy">Heavy</option>
+            <option value="Slim" id="Slim">Slim</option>
+        </select><br><br>
+
+        <label for="">complexion</label>
+        <select name="complexion" id="" >
+            <option value="please select">Please select</option>
+            <option value="very-fair" id="very-fair">Very fair</option>
+            <option value="fair" id="fair">Fair</option>
+            <option value="Wheatish" id="Wheatish">Wheatish</option>
+            <option value="medium" id="medium">medium</option>
+            <option value="dark" id="dark">dark</option>
+        </select><br><br>
+
+        <button type="submit">Filter profiles</button>
+
+    </div>
+   
+        
+    </form>
+</body>
+</html>

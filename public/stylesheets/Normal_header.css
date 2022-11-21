@@ -1,0 +1,109 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.normal-header-container{
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(255, 4, 196, 0.788);
+    height: 75px;
+}
+
+.normal-header-container .logo{
+    display: flex;
+    margin-left: 30px;
+    align-items: center;
+    justify-content: space-around;
+
+}
+
+.normal-header-container .logo img{
+    width: 50px;
+    height: 50px;
+}
+
+.normal-header-container .logo h1{
+    color:midnightblue;
+    font-family: 'Courgette';
+    font-size: 40px;
+    margin-left: 40px;
+}
+
+.kiss{
+    rotate: -48deg;
+    width: 45px;
+    height: 45px;
+    margin-left: -16px;
+}
+
+.signin{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+}
+
+.signinbutton{
+    border: none;
+    width: 83px;
+    height: 34px;
+    background: rgb(93, 0, 255);
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: 0.1s;
+}
+
+.signinbutton:hover{
+    background: red;
+}
+
+
+@media (max-width:600px) {
+    .normal-header-container{
+        height: 65px;
+        display: grid;
+        grid-template-columns: 1fr 0.2fr;
+
+    }
+    .normal-header-container .logo{
+        margin-left: 5px;
+        display: flex;
+        justify-content: left;
+    }
+    .normal-header-container .logo img{
+        width: 30px;
+        height: 30px;
+    }
+    .normal-header-container .logo h1{
+        font-size: 25px;
+        margin-left: 10px;
+    }
+    .kiss{
+        margin-left: -9px;
+    }
+
+    .signin{
+        justify-content: right;
+        margin-right: 10px;
+        width: fit-content;
+    }
+    .signinbutton{
+        width: 67px;
+        height: 26px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width:430px) {
+    .normal-header-container .logo h1{
+        font-size: 25px;
+        margin-left: 10px;
+    }
+
+ 
+}
+
