@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="text-align:center;">
+
+<h2>Requests</h2>
+<br>
+<br>
+
+
+
+<table style="width:100%;">
+    {{# each requested_users}}
+
+    <tr>
+        <td>{{this.name}}</td>
+        <td><img src="/userimages/{{this._id}}.jpg" alt="" style="width: 90px;height: 90px;"></td>
+        <td> <button id="acceptbtn">Accept</button></td>
+    </tr>
+    <tr></tr>
+    <tr></tr>
+    <tr></tr>
+
+    {{/each}}
+
+</table>
+
+<h2>My intrests</h2>
+
+<table style="width:100%;">
+    {{# each intrested_users}}
+        <tr>
+               <td>{{this.name}}</td>
+                <td><img src="userimages/{{this._id}}.jpg" alt="" style="width: 90px;height: 90px;" ></td>
+                <td><p>intrest send</p></td>
+                <td></td>
+                <td></td>
+                <td></td>
+        </tr>
+    {{/each}}
+</table>
+
+{{log intrested_users}}
+
+
+</body>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
+      
+    </script>
+
+</html>

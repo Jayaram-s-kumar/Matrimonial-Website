@@ -1,5 +1,6 @@
 var express = require('express');
 const { ObjectId } = require('mongodb');
+const { PromiseProvider } = require('mongoose');
 var router = express.Router();
 const db = require('../Database')
 
@@ -14,7 +15,7 @@ const verifylogin = (req,res,next)=>{
 /* GET home page. */
 router.get('/', async function(req,res){
   let allusers =await db.get().collection("userinfo").find().toArray()
-  res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers})
+  res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers,loginid:req.session.loginid})
 });
 
 router.get('/signin',verifylogin,(req,res)=>{
@@ -97,6 +98,15 @@ router.post('/createuser',(req,res)=>{
     }) 
     }
   })
+  db.get().collection('userinfo').updateOne(
+    {loginid:req.body.loginid},
+    {
+      $set:{
+        intrested:[],
+        myintrests:[]
+      }
+    }
+  )
   res.redirect('/myaccount')
 })
 
@@ -188,4 +198,84 @@ router.post('/filter',async (req,res)=>{
   
 })
 
-module.exports = router;
+
+router.get('/requests',async(req,res)=>{
+  let current_user =await db.get().collection('userinfo').findOne({loginid:req.session.loginid})
+  let requsets_id_array = current_user.intrested
+  let array=[]
+  for(i=0;i<requsets_id_array.length;i++){
+    array[i]=requsets_id_array[i].userid
+  }
+
+
+  let requested_users =await db.get().collection('userinfo').find(
+    {
+      _id:{
+        $in:array
+      }
+    }
+  ).toArray()
+
+  let myintrestsid_id_array = current_user.myintrests
+  let array1=[]
+  for(i=0;i<myintrestsid_id_array.length;i++){
+    array1[i]=myintrestsid_id_array[i].userid
+  }
+
+  let intrested_users = await db.get().collection('userinfo').find(
+    {
+      _id:{
+        $in:array1
+      }
+    }
+  ).toArray()
+
+  res.render('layouts/requests',{loggedin:req.session.loggedin,username:req.session.username,loginid:req.session.loginid,requested_users:requested_users,intrested_users:intrested_users})
+  //console.log(requested_users)
+  //console.log(intrested_users) 
+  console.log(array1) 
+  
+}) 
+
+
+
+router.post('/sendintrest',async(req,res)=>{  
+  
+  db.get().collection('userinfo').updateOne(
+    {loginid:req.body.loginid},
+    {
+      $push:{
+        myintrests:{
+          userid:ObjectId(req.body.request_to),
+          accepted:false
+        }
+      }
+    }
+  ) 
+ 
+  console.log("myintrest:",req.body.request_to)
+
+  let data = await  db.get().collection('userinfo').findOne( 
+    {loginid:req.body.loginid} 
+  )
+
+  //use findone and don't use toArray()
+
+  const userid = data._id
+  db.get().collection('userinfo').updateOne(
+    {_id:ObjectId(req.body.request_to)}, 
+    {
+      $push:{
+        intrested:{
+          userid:userid,
+          accepted:false
+        }
+      } 
+    }
+  )
+ 
+  console.log("intrested:",userid.toString())  
+  
+})
+
+module.exports = router;  
