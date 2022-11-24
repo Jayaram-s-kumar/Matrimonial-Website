@@ -32,7 +32,7 @@ router.get('/', async function(req,res){
   }
 
   res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers,loginid:req.session.loginid,curr_user_id:curr_user_id})
-});  
+});       
 
 
 
@@ -103,30 +103,39 @@ router.get('/myaccount',async(req,res)=>{
 
 router.post('/createuser',(req,res)=>{
   console.log("createing user")
-  db.get().collection('userinfo').insertOne(req.body).then((data)=>{
-    let imagename = data.insertedId
-    if(req.files){
-      let image = req.files.Image
-      image.mv("./public/userimages/"+imagename+".jpg",(err,done)=>{
-      if(!err){
-        console.log("image inserted")
-      }else{
-        throw err
+  if(req.body.name=='' || req.body.age=='' || req.body.fathersname=='' ||
+  req.body.mothersname=='' || req.body.Education=='' || req.body.familytype==''
+  || req.body.familystatus=='' || req.body.livingin=='' || 
+  req.body.height=='' || req.body.bodytype=='' || req.body.complexion==''||
+  req.body.about==''){
+    res.render('layouts/create_user',{loginid:req.session.loginid,loggedin:req.session.loggedin,username:req.session.username,Error:'Please fill all the fields',partial_data:req.body})
+  }else{
+    db.get().collection('userinfo').insertOne(req.body).then((data)=>{
+      let imagename = data.insertedId
+      if(req.files){
+        let image = req.files.Image
+        image.mv("./public/userimages/"+imagename+".jpg",(err,done)=>{
+        if(!err){
+          console.log("image inserted")
+        }else{
+          throw err
+        }
+      }) 
       }
-    }) 
-    }
-  })
-  db.get().collection('userinfo').updateOne(
-    {loginid:req.body.loginid},
-    {
-      $set:{
-        intrested:[],
-        myintrests:[]
+    })
+    db.get().collection('userinfo').updateOne(
+      {loginid:req.body.loginid},
+      {
+        $set:{
+          intrested:[],
+          myintrests:[]
+        }
       }
-    }
-  )
-  res.redirect('/myaccount') 
-  console.log(req.session)
+    )
+    res.redirect('/myaccount') 
+    console.log(req.session)
+  }
+ 
 })
 
 router.get("/edit/:id",async (req,res)=>{
@@ -215,56 +224,58 @@ router.post('/filter',async (req,res)=>{
 
   res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,filter:true,data:filereddata})
   
-})
+}) 
 
 
 router.get('/requests',verifylogin, async(req,res)=>{
   let current_user =await db.get().collection('userinfo').findOne({loginid:req.session.loginid})
-  let requests_id_array = current_user.intrested
-  let array=[]
-  for(i=0;i<requests_id_array.length;i++){
-    array[i]=requests_id_array[i].userid
-  }
-
-
-  let requested_users =await db.get().collection('userinfo').find(
-    {
-      _id:{
-        $in:array
-      }
+  if(current_user){
+    let requests_id_array = current_user.intrested
+    let array=[]
+    for(i=0;i<requests_id_array.length;i++){
+      array[i]=requests_id_array[i].userid
     }
-  ).toArray()  
-
-  let myintrestsid_id_array = current_user.myintrests
-  let array1=[]
-  for(i=0;i<myintrestsid_id_array.length;i++){
-    array1[i]=myintrestsid_id_array[i].userid
-  }
-
-  let intrested_users = await db.get().collection('userinfo').find(
-    {
-      _id:{
-        $in:array1
-      }
-    }
-  ).toArray()
-
   
-  let currdata = await db.get().collection('userinfo').findOne(
-    {
-      loginid:req.session.loginid
-    } 
-  )
-
-  let curr_user_id=''
-  if(currdata){
-    curr_user_id = currdata._id
+  
+    let requested_users =await db.get().collection('userinfo').find(
+      {
+        _id:{
+          $in:array
+        }
+      }
+    ).toArray()  
+  
+    let myintrestsid_id_array = current_user.myintrests
+    let array1=[]
+    for(i=0;i<myintrestsid_id_array.length;i++){
+      array1[i]=myintrestsid_id_array[i].userid
+    }
+  
+    let intrested_users = await db.get().collection('userinfo').find(
+      {
+        _id:{
+          $in:array1
+        }
+      }
+    ).toArray()
+  
+    
+    let currdata = await db.get().collection('userinfo').findOne(
+      {
+        loginid:req.session.loginid
+      } 
+    )
+  
+    let curr_user_id=''
+    if(currdata){
+      curr_user_id = currdata._id
+    }
+  
+    res.render('layouts/requests',{loggedin:req.session.loggedin,username:req.session.username,loginid:req.session.loginid,requested_users:requested_users,intrested_users:intrested_users,curr_user_id:curr_user_id,requests_id_array:requests_id_array})
+  
+  }else{
+    res.redirect('/myaccount')
   }
-
-  res.render('layouts/requests',{loggedin:req.session.loggedin,username:req.session.username,loginid:req.session.loginid,requested_users:requested_users,intrested_users:intrested_users,curr_user_id:curr_user_id,requests_id_array:requests_id_array})
-  //console.log(requested_users)
-  //console.log(intrested_users) 
-  //console.log(array1)
   
   
 }) 
@@ -360,6 +371,41 @@ router.get('/viewprofile/:id',async(req,res)=>{
   )
   res.render('layouts/viewprofile',{data:data})
 })  
+
+router.post('/search',async(req,res)=>{
+  let data = await db.get().collection('userinfo').findOne(
+    {
+      name:req.body.search_name
+    }
+  )
+  
+  let currdata = await db.get().collection('userinfo').findOne(
+    {
+      loginid:req.session.loginid
+    }
+  )
+
+
+  let curr_user_id=''
+  if(currdata){
+    curr_user_id = currdata._id 
+  }
+
+  //console.log(curr_user_id)
+  //console.log(data)
+
+  res.render('layouts/home',{
+    loggedin:req.session.loggedin,
+    username:req.session.username,
+    loginid:req.session.loginid,
+    curr_user_id:curr_user_id,
+    searched_data:data,
+    intrested:data.intrested,
+  })
+ 
+  //res.redirect('/')
+
+})
 
 
   

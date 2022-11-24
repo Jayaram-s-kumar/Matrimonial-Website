@@ -10,6 +10,9 @@
     <div class="container" style="text-align:center;">
 
         <h1>create your profile..</h1><br><br>
+
+        <p>{{Error}}</p>
+        <br><br>
   
         <form method="post" action="/createuser" enctype="multipart/form-data">
             <img src="" alt="" id="currentimg" style="width: 191px;height: 247px;"><br>
@@ -18,13 +21,13 @@
             <label for="">Upload Image</label><br><br>
 
             <label>Name</label>
-            <input type="text" name="name" id="name" ><br><br>
+            <input type="text" name="name" id="name" value="{{partial_data.name}}"><br><br>
             <label for="">Age</label>
-            <input type="text" name="age" id=""><br><br>
+            <input type="text" name="age" id="" value="{{partial_data.age}}"><br><br>
             <label for="">Fathers name</label>
-            <input type="text" name="fathersname" id="" ><br><br>
+            <input type="text" name="fathersname" id="" value="{{partial_data.fathersname}}"><br><br>
             <label for="">Mothers name</label>
-            <input type="text" name="mothersname" id="" ><br><br>
+            <input type="text" name="mothersname" id=""  value="{{partial_data.mothersname}}"><br><br>
             
             <label for="">Education</label>
             <select name="Education" ><br><br>
@@ -37,26 +40,26 @@
 
             <label for="">Family type</label>
             <select name="familytype" >
-                <option value="please select">Please select</option>
+                <option value="">Please select</option>
                 <option value="joint-family" id="joint-family">Joint Family</option>
                 <option value="nuclear-family" id="nuclear-family">Nuclear Family</option>
             </select><br><br>
 
             <label for="">Family Status</label>
             <select name="familystatus" id="">
-                <option value="please select">Please select</option>
+                <option value="">Please select</option>
                 <option value="lower-income" id="lower-income">Lower income</option>
                 <option value="middle-class" id="middle-class">Middle class</option>
                 <option value="upper-middle" id="upper-middle">Upper middle class</option>
                 <option value="rich">Rich</option>
             </select><br><br>
             <label for="">Living in</label>
-            <input type="text" name="livingin" id="" ><br><br>
+            <input type="text" name="livingin" id="" value="{{partial_data.livingin}}"><br><br>
             <label for="">Height in cm</label>
-            <input type="number" name="height" id="" ><br><br>
+            <input type="number" name="height" id="" value="{{partial_data.height}}"><br><br>
             <label>Body-type</label>
             <select name="bodytype" id="">
-                <option value="please select">Please select</option>
+                <option value="">Please select</option>
                 <option value="Athletic" id="Athletic">Athletic</option>
                 <option value="Average" id="Average">Average</option>
                 <option value="Heavy" id="Heavy">Heavy</option>
@@ -64,7 +67,7 @@
             </select><br><br>
             <label for="">complexion</label>
             <select name="complexion" id="" >
-                <option value="please select">Please select</option>
+                <option value="">Please select</option>
                 <option value="very-fair" id="very-fair">Very fair</option>
                 <option value="fair" id="fair">Fair</option>
                 <option value="Wheatish" id="Wheatish">Wheatish</option>
@@ -72,10 +75,10 @@
                 <option value="dark" id="dark">dark</option>
             </select><br><br>
             <label for="">About me</label><br>
-            <textarea name="about" id="" cols="30" rows="5"></textarea><br><br><br>
+            <textarea name="about" id="" cols="30" rows="5">{{partial_data.about}}</textarea><br><br><br>
             
               
-                <button type="submit">Create profile</button>
+            <button type="submit">Create profile</button>
                 
              
 
@@ -89,15 +92,20 @@
     </div>
 </body>
 
+
+
 <script>
     function viewImage(event){
        document.getElementById("currentimg").src=URL.createObjectURL(event.target.files[0])
     }
 
+    
+    document.getElementById("{{partial_data.Education}}").selected="selected"
+    document.getElementById("{{partial_data.familytype}}").selected="selected"
+    document.getElementById("{{partial_data.familystatus}}").selected="selected"
+    document.getElementById("{{partial_data.bodytype}}").selected="selected"
+    document.getElementById("{{partial_data.complexion}}").selected="selected"
 
-
-
-
-
+  
 </script>
 </html>

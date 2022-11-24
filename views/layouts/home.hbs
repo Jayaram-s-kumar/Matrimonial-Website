@@ -18,10 +18,87 @@
 <body>
     <h1>Welcome to Just4marry</h1>
 
+    <br><br>
+    <form action="/search" method="post" style="text-align:center;">
+         <input type="text" name="search_name" id="" placeholder="search profiles">
+         <button type="submit">search</button>
+    </form>
+    <br><br>
+   
+
     {{#if filter}}
         <br><br>
         <h3>filterd profiles</h3>
     {{/if}}
+
+    {{#if loggedin}}
+
+    {{#if searched_data}}
+    
+        {{#check searched_data.intrested curr_user_id}}
+            {{#if viewprofile}}
+            <a href="/viewprofile/{{../searched_data._id}}">
+                 <button>View profile</button>
+            </a>            
+            {{/if}}
+
+            {{#if intrestsend}}
+                <button>Intrest send</button>
+            {{/if}}
+
+            {{#if iamintrested}}
+                  <button onclick="sendintrest('{{../searched_data._id}}')" class="intrestbtn">I am intrested</button>
+            {{/if}}
+         
+        {{/check}}  
+
+
+           <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
+            <img src="userimages/{{searched_data._id}}.jpg" style="width: 191px;height: 247px;" alt="">
+            {{searched_data.name}} <br>
+            {{searched_data.age}} <br>
+            {{searched_data.Education}} <br>
+            {{searched_data.familytype}} <br>
+            {{searched_data.familystatus}} <br>
+            {{searched_data.bodytype}} <br>
+            {{searched_data.complexion}} <br>
+            <br>
+            <br>
+            </div>
+
+    {{/if}}
+
+    {{/if}}
+
+    {{#unless loggedin}}
+
+    {{#if searched_data}}
+
+          <a href="/signin"> 
+                <button>I am intrested</button>
+            </a>
+
+       <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
+            <img src="userimages/{{searched_data._id}}.jpg" style="width: 191px;height: 247px;" alt="">
+            {{searched_data.name}} <br>
+            {{searched_data.age}} <br>
+            {{searched_data.Education}} <br>
+            {{searched_data.familytype}} <br>
+            {{searched_data.familystatus}} <br>
+            {{searched_data.bodytype}} <br>
+            {{searched_data.complexion}} <br>
+            <br>
+            <br>
+        </div>
+
+    {{/if}}
+
+    {{/unless}}
+
+
+
+
+
 
 
     
@@ -59,7 +136,7 @@
      
 
        
-
+          
       
          {{# each allusers}}
 

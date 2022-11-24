@@ -23,11 +23,10 @@ const { connected } = require('process');
 // view engine setup
 app.engine('hbs',engine({extname:'hbs',defaultLayout:'default', layoutsDir: path.join(__dirname, '/views/layouts'),partialsDir:path.join(__dirname, 'views/partials'),helpers:{
     check:function(array,id,options){
-       
+
         let found = false
         for(i=0;i<array.length;i++){
-       
-         
+          
             if(id.toString()==array[i].userid.toString()){
                 if(array[i].accepted==true){
                     
