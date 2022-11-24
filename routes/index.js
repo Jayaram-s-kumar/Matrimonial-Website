@@ -24,15 +24,15 @@ router.get('/', async function(req,res){
     {
       loginid:req.session.loginid
     } 
-  )
+  )     
 
   let curr_user_id=''
   if(currdata){
-    curr_user_id = currdata._id
+    curr_user_id = currdata._id 
   }
 
   res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers,loginid:req.session.loginid,curr_user_id:curr_user_id})
-});
+});  
 
 
 
@@ -348,7 +348,19 @@ router.post('/acceptrequest',async(req,res)=>{
     }
   )
   res.redirect('/requests') 
-})          
+}) 
+
+
+router.get('/viewprofile/:id',async(req,res)=>{
+  console.log(req.params.id)
+  let data =await db.get().collection('userinfo').findOne(
+    {
+      _id:ObjectId(req.params.id)
+    }
+  )
+  res.render('layouts/viewprofile',{data:data})
+})  
+
 
   
 

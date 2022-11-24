@@ -65,7 +65,9 @@
 
         {{#check this.intrested ../curr_user_id}}
             {{#if viewprofile}}
-                  <button>View profile</button>
+            <a href="/viewprofile/{{../this._id}}">
+                 <button>View profile</button>
+            </a>            
             {{/if}}
 
             {{#if intrestsend}}
@@ -73,7 +75,15 @@
             {{/if}}
 
             {{#if iamintrested}}
-                  <button onclick="sendintrest('{{../this._id}}')" id="intrestbtn">I am intrested</button>
+                {{#if ../../loggedin}}
+                    {{log "id is"}}
+                    {{log ../this._id}}
+                  <button onclick="sendintrest('{{../this._id}}')" class="intrestbtn">I am intrested</button>
+                {{else}}
+                <a href="/signin"> 
+                     <button>I am intrested</button>
+                </a>
+                {{/if}}
             {{/if}}
 
   
@@ -102,7 +112,7 @@
           <script>
          
             window.onload = function () {
-            var all_buttons = document.querySelectorAll('button');
+            var all_buttons = document.getElementsByClassName('intrestbtn');
             console.log(all_buttons);
             for (i = 0; i < all_buttons.length; i++) {
             all_buttons[i].addEventListener('click',function () {
