@@ -15,16 +15,29 @@
 
 
 <table style="width:100%;">
+  
     {{# each requested_users}}
+
 
     <tr>
         <td>{{this.name}}</td>
         <td><img src="/userimages/{{this._id}}.jpg" alt="" style="width: 90px;height: 90px;"></td>
-        <td> <button id="acceptbtn">Accept</button></td>
+        {{!-- put    '{{this._id}}'   here not    {{this._id}}      --}}
+
+         {{#ifiacceptedornot ../requests_id_array this._id}}
+        {{#if accept}}
+        <td> <button  onclick="acceptrequest('{{../this._id}}')">Accept</button></td>
+        {{/if}}
+        {{#if accepted}}
+        <td><p>accepted</p></td>
+        {{/if}}
+         {{/ifiacceptedornot}} 
     </tr>
     <tr></tr>
     <tr></tr>
     <tr></tr>
+
+    
 
     {{/each}}
 
@@ -34,24 +47,53 @@
 
 <table style="width:100%;">
     {{# each intrested_users}}
+   
         <tr>
                <td>{{this.name}}</td>
                 <td><img src="userimages/{{this._id}}.jpg" alt="" style="width: 90px;height: 90px;" ></td>
-                <td><p>intrest send</p></td>
+                 {{#ifheacceptedornot this.intrested ../curr_user_id}}
+                 {{#if accepted}}
+                <td><p>accepted</p></td>
+                {{/if}}
+                {{#if accept}}
+                <td><p>Intrest send</p></td>
+                {{/if}}
+                {{/ifheacceptedornot}}
                 <td></td>
                 <td></td>
                 <td></td>
         </tr>
+    
     {{/each}}
 </table>
 
-{{log intrested_users}}
+
 
 
 </body>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
-      
+           window.onload = function () {
+            var all_buttons = document.querySelectorAll('button');
+            console.log(all_buttons);
+            for (i = 0; i < all_buttons.length; i++) {
+            all_buttons[i].addEventListener('click',function () {
+            this.innerHTML = 'Accepted';
+                    });
+                };
+            };
+
+            function acceptrequest(id){
+                console.log(id)
+                $.ajax({
+                    url:'/acceptrequest',
+                    data:{
+                        requested_id:id
+                    },
+                    method:'post'
+                })
+            }
+
     </script>
 
 </html>

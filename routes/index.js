@@ -14,9 +14,27 @@ const verifylogin = (req,res,next)=>{
 
 /* GET home page. */
 router.get('/', async function(req,res){
-  let allusers =await db.get().collection("userinfo").find().toArray()
-  res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers,loginid:req.session.loginid})
+  let allusers =await db.get().collection("userinfo").find(
+    {loginid:{
+      $nin:[req.session.loginid]
+    }}
+  ).toArray()
+
+  let currdata = await db.get().collection('userinfo').findOne(
+    {
+      loginid:req.session.loginid
+    } 
+  )
+
+  let curr_user_id=''
+  if(currdata){
+    curr_user_id = currdata._id
+  }
+
+  res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers,loginid:req.session.loginid,curr_user_id:curr_user_id})
 });
+
+
 
 router.get('/signin',verifylogin,(req,res)=>{
   res.render('layouts/signin')
@@ -107,7 +125,8 @@ router.post('/createuser',(req,res)=>{
       }
     }
   )
-  res.redirect('/myaccount')
+  res.redirect('/myaccount') 
+  console.log(req.session)
 })
 
 router.get("/edit/:id",async (req,res)=>{
@@ -199,12 +218,12 @@ router.post('/filter',async (req,res)=>{
 })
 
 
-router.get('/requests',async(req,res)=>{
+router.get('/requests',verifylogin, async(req,res)=>{
   let current_user =await db.get().collection('userinfo').findOne({loginid:req.session.loginid})
-  let requsets_id_array = current_user.intrested
+  let requests_id_array = current_user.intrested
   let array=[]
-  for(i=0;i<requsets_id_array.length;i++){
-    array[i]=requsets_id_array[i].userid
+  for(i=0;i<requests_id_array.length;i++){
+    array[i]=requests_id_array[i].userid
   }
 
 
@@ -214,7 +233,7 @@ router.get('/requests',async(req,res)=>{
         $in:array
       }
     }
-  ).toArray()
+  ).toArray()  
 
   let myintrestsid_id_array = current_user.myintrests
   let array1=[]
@@ -230,10 +249,23 @@ router.get('/requests',async(req,res)=>{
     }
   ).toArray()
 
-  res.render('layouts/requests',{loggedin:req.session.loggedin,username:req.session.username,loginid:req.session.loginid,requested_users:requested_users,intrested_users:intrested_users})
+  
+  let currdata = await db.get().collection('userinfo').findOne(
+    {
+      loginid:req.session.loginid
+    } 
+  )
+
+  let curr_user_id=''
+  if(currdata){
+    curr_user_id = currdata._id
+  }
+
+  res.render('layouts/requests',{loggedin:req.session.loggedin,username:req.session.username,loginid:req.session.loginid,requested_users:requested_users,intrested_users:intrested_users,curr_user_id:curr_user_id,requests_id_array:requests_id_array})
   //console.log(requested_users)
   //console.log(intrested_users) 
-  console.log(array1) 
+  //console.log(array1)
+  
   
 }) 
 
@@ -241,13 +273,13 @@ router.get('/requests',async(req,res)=>{
 
 router.post('/sendintrest',async(req,res)=>{  
   
-  db.get().collection('userinfo').updateOne(
+  db.get().collection('userinfo').updateOne(  
     {loginid:req.body.loginid},
     {
       $push:{
         myintrests:{
           userid:ObjectId(req.body.request_to),
-          accepted:false
+          accepted:false  
         }
       }
     }
@@ -278,4 +310,53 @@ router.post('/sendintrest',async(req,res)=>{
   
 })
 
-module.exports = router;  
+   
+router.post('/acceptrequest',async(req,res)=>{
+ // console.log(req.body)
+  let data = await db.get().collection('userinfo').updateOne(
+    {loginid:req.session.loginid,"intrested.userid":ObjectId(req.body.requested_id)},
+   
+    {
+      $set:{
+        "intrested.$.accepted":true
+      }
+    }
+  )
+
+
+  let currdata = await db.get().collection('userinfo').findOne(
+    {
+      loginid:req.session.loginid
+    } 
+  )
+
+  let curr_user_id=''
+  if(currdata){
+    curr_user_id = currdata._id
+  }
+
+  //console.log("current user",curr_user_id)
+  //console.log("myintrests id",req.body.requested_id)
+  
+  await db.get().collection('userinfo').updateOne(
+    {_id:ObjectId(req.body.requested_id),"myintrests.userid":curr_user_id},
+
+    {
+      $set:{
+        "myintrests.$.accepted":true
+      }
+    }
+  )
+  res.redirect('/requests') 
+})          
+
+  
+
+
+
+
+module.exports = router;
+
+
+
+     

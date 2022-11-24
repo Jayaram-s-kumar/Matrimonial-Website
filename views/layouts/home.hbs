@@ -55,9 +55,34 @@
 
 
     <div class="container" style="display: flex;width: 100%;justify-content: space-around;margin-top: 50px;">
+
+     
+
+       
+
+      
          {{# each allusers}}
 
-          <button onclick="sendintrest('{{this._id}}')">I am intrested</button>
+        {{#check this.intrested ../curr_user_id}}
+            {{#if viewprofile}}
+                  <button>View profile</button>
+            {{/if}}
+
+            {{#if intrestsend}}
+                <button>Intrest send</button>
+            {{/if}}
+
+            {{#if iamintrested}}
+                  <button onclick="sendintrest('{{../this._id}}')" id="intrestbtn">I am intrested</button>
+            {{/if}}
+
+  
+        {{/check}} 
+
+ 
+   
+      
+        
 
             <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">                     
                 <img src="userimages/{{this._id}}.jpg" alt="" style="width: 191px;height: 247px;"><br>          
@@ -101,7 +126,12 @@
                 })
             }
           </script>
+
+       
     </div>
+
+
+
 
    
 
