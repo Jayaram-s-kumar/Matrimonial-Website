@@ -18,7 +18,12 @@ app.use(fileupload())
 
 var cookieParser = require("cookie-parser")
 var session = require('express-session');
-const { connected } = require('process');
+const { connected } = require('process'); 
+
+app.use(function(req, res, next) {
+    res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    next();
+}); 
 
 // view engine setup
 app.engine('hbs',engine({extname:'hbs',defaultLayout:'default', layoutsDir: path.join(__dirname, '/views/layouts'),partialsDir:path.join(__dirname, 'views/partials'),helpers:{
@@ -26,7 +31,7 @@ app.engine('hbs',engine({extname:'hbs',defaultLayout:'default', layoutsDir: path
 
         let found = false
         for(i=0;i<array.length;i++){
-          
+            
             if(id.toString()==array[i].userid.toString()){
                 if(array[i].accepted==true){
                     
@@ -42,7 +47,7 @@ app.engine('hbs',engine({extname:'hbs',defaultLayout:'default', layoutsDir: path
             }
 
         }  
-        if(!found){
+        if(!found){ 
             
             return options.fn({iamintrested:true})
         }
@@ -64,17 +69,24 @@ app.engine('hbs',engine({extname:'hbs',defaultLayout:'default', layoutsDir: path
         }
     },
     ifheacceptedornot:function(intersted_array,curr_user_id,options){
-      //  console.log(intersted_array)
-      //  console.log(curr_user_id)
+      console.log(intersted_array)
+      console.log(curr_user_id)
         for(i=0;i<intersted_array.length;i++){
             if(intersted_array[i].userid.toString()==curr_user_id.toString()){
                 if(intersted_array[i].accepted==true){
                     return options.fn({
                         accepted:true
                     })
-                }else{
+                }
+                else if(intersted_array[i].declined==true){
+                    console.log("entered")
                     return options.fn({
-                        accept:true
+                        declined:true  
+                    })
+                }
+                else{
+                    return options.fn({
+                        accept:true 
                     })
                 }
             }

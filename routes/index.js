@@ -14,6 +14,16 @@ const verifylogin = (req,res,next)=>{
 
 /* GET home page. */
 router.get('/', async function(req,res){
+  if(req.session.loggedin){
+    let acc_created = await db.get().collection('userinfo').findOne({
+      loginid:req.session.loginid
+    })
+    if(acc_created){
+      req.session.acc_created=true
+    }else{
+      req.session.acc_created=false
+    }
+  }
   let allusers =await db.get().collection("userinfo").find(
     {loginid:{
       $nin:[req.session.loginid]
@@ -25,14 +35,15 @@ router.get('/', async function(req,res){
       loginid:req.session.loginid
     } 
   )     
-
+ 
   let curr_user_id=''
   if(currdata){
     curr_user_id = currdata._id 
   }
 
-  res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers,loginid:req.session.loginid,curr_user_id:curr_user_id})
-});       
+  res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers,loginid:req.session.loginid,curr_user_id:curr_user_id,acc_created:req.session.acc_created})
+  console.log(req.session)
+});          
 
 
 
@@ -77,11 +88,14 @@ router.post('/signin',async(req,res)=>{
 
 })
 
+
+
+
 router.get('/logout',(req,res)=>{
   req.session.destroy()
   res.redirect('/')
 })
-
+  
 router.get('/myaccount',async(req,res)=>{
   
     console.log(req.session)
@@ -90,7 +104,7 @@ router.get('/myaccount',async(req,res)=>{
       let data =await db.get().collection('userinfo').findOne({loginid:req.session.loginid})
      
       if(data){
-        res.render("layouts/profile",{loggedin:req.session.loggedin,username:req.session.username,userdata:data,imagename:data._id.toString()})
+        res.render("layouts/myprofile",{loggedin:req.session.loggedin,username:req.session.username,userdata:data,imagename:data._id.toString()})
    
       }else{
       res.render('layouts/create_user',{loginid:req.session.loginid,loggedin:req.session.loggedin,username:req.session.username})
@@ -108,6 +122,7 @@ router.post('/createuser',(req,res)=>{
   || req.body.familystatus=='' || req.body.livingin=='' || 
   req.body.height=='' || req.body.bodytype=='' || req.body.complexion==''||
   req.body.about==''){
+    console.log(req.body)
     res.render('layouts/create_user',{loginid:req.session.loginid,loggedin:req.session.loggedin,username:req.session.username,Error:'Please fill all the fields',partial_data:req.body})
   }else{
     db.get().collection('userinfo').insertOne(req.body).then((data)=>{
@@ -132,6 +147,7 @@ router.post('/createuser',(req,res)=>{
         }
       }
     )
+    req.session.acc_created=true
     res.redirect('/myaccount') 
     console.log(req.session)
   }
@@ -150,36 +166,58 @@ router.get("/edit/:id",async (req,res)=>{
 })
 
 router.post('/edit/:id',async (req,res)=>{
-  await db.get().collection("userinfo").updateOne({_id:ObjectId(req.params.id)},{
-    $set:{
-      name:req.body.name,
-      age:req.body.age,
-      fathersname:req.body.fathersname,
-      mothersname:req.body.mothersname,
-      Education:req.body.Education,
-      familytype:req.body.familytype,
-      familystatus:req.body.familystatus,
-      livingin:req.body.livingin,
-      height:req.body.height,
-      bodytype:req.body.bodytype,
-      complexion:req.body.complexion,
-      about:req.body.about,
+  if(req.body.name=='' || req.body.age=='' || req.body.fathersname=='' ||
+  req.body.mothersname=='' || req.body.Education=='' || req.body.familytype==''
+  || req.body.familystatus=='' || req.body.livingin=='' || 
+  req.body.height=='' || req.body.bodytype=='' || req.body.complexion==''||
+  req.body.about==''){
+    let imagename =await db.get().collection('userinfo').findOne({
       loginid:req.body.loginid
-    }
-  }).then((data)=>{
-    let imagename = req.params.id
-    if(req.files){
-      let image = req.files.Image
-      image.mv("./public/userimages/"+imagename+".jpg",(err,done)=>{
-      if(!err){
-        console.log("image updated")
-      }else{
-        throw err
+    })
+    let data = req.body
+    console.log(data)
+    console.log(imagename._id.toString())   
+    res.render('layouts/edit_user',
+    {currdata:data, 
+      imagename:imagename._id.toString(),
+      loggedin:req.session.loggedin,   
+      username:req.session.username,
+      loginid:req.session.loginid,
+      Error:"please fill all the fields"
+    })
+  }else{
+    await db.get().collection("userinfo").updateOne({_id:ObjectId(req.params.id)},{
+      $set:{
+        name:req.body.name,
+        age:req.body.age,
+        fathersname:req.body.fathersname,
+        mothersname:req.body.mothersname,
+        Education:req.body.Education,
+        familytype:req.body.familytype,
+        familystatus:req.body.familystatus,
+        livingin:req.body.livingin,
+        height:req.body.height,
+        bodytype:req.body.bodytype,
+        complexion:req.body.complexion,
+        about:req.body.about,
+        loginid:req.body.loginid
       }
-    }) 
-    }
-  })
-  res.redirect('/myaccount')
+    }).then((data)=>{
+      let imagename = req.params.id
+      if(req.files){
+        let image = req.files.Image
+        image.mv("./public/userimages/"+imagename+".jpg",(err,done)=>{
+        if(!err){
+          console.log("image updated")
+        }else{
+          throw err
+        }
+      }) 
+      }
+    })
+    res.redirect('/myaccount')
+  }
+ 
  
 })
 
@@ -197,30 +235,29 @@ router.post('/filter',async (req,res)=>{
   const lower = req.body.lowerage ? req.body.lowerage : 0
   const higer = req.body.higherage ? req.body.higherage : 200
 
-  let age=[]
-  for(i=lower;i<higer;i++){
-    age[i]=i.toString()
-  }
-  //console.log(age)
+ let array=[]
+ for(i=lower;i<higer;i++){
+   array[i]=i.toString()
+ }
 
+ console.log(array)
 
- 
   const filereddata = await db.get().collection("userinfo").find({
-    age:{$in:age},
+    age:{$in:array},
     Education:{$in:edu_data},
     familytype:{$in:familytype_data},
     familystatus:{$in:familystatus_data},
     bodytype:{$in:bodytype_data},
     complexion:{$in:complexion_data}
    }).toArray()
-
+  
   console.log("lower",lower,"higer",higer)
   console.log(edu_data)
   console.log(familystatus_data)
   console.log(familytype_data)
   console.log(bodytype_data)
   console.log(complexion_data)
-  //console.log(filereddata)
+  console.log(filereddata)
 
   res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,filter:true,data:filereddata})
   
@@ -235,7 +272,7 @@ router.get('/requests',verifylogin, async(req,res)=>{
     for(i=0;i<requests_id_array.length;i++){
       array[i]=requests_id_array[i].userid
     }
-  
+   
   
     let requested_users =await db.get().collection('userinfo').find(
       {
@@ -246,6 +283,7 @@ router.get('/requests',verifylogin, async(req,res)=>{
     ).toArray()  
   
     let myintrestsid_id_array = current_user.myintrests
+   
     let array1=[]
     for(i=0;i<myintrestsid_id_array.length;i++){
       array1[i]=myintrestsid_id_array[i].userid
@@ -257,7 +295,7 @@ router.get('/requests',verifylogin, async(req,res)=>{
           $in:array1
         }
       }
-    ).toArray()
+    ).toArray()  
   
     
     let currdata = await db.get().collection('userinfo').findOne(
@@ -271,32 +309,64 @@ router.get('/requests',verifylogin, async(req,res)=>{
       curr_user_id = currdata._id
     }
   
-    res.render('layouts/requests',{loggedin:req.session.loggedin,username:req.session.username,loginid:req.session.loginid,requested_users:requested_users,intrested_users:intrested_users,curr_user_id:curr_user_id,requests_id_array:requests_id_array})
+    res.render('layouts/requests',{
+      loggedin:req.session.loggedin,
+      username:req.session.username,
+      loginid:req.session.loginid,
+      requested_users:requested_users,
+      intrested_users:intrested_users,
+      curr_user_id:curr_user_id,
+      requests_id_array:requests_id_array,
+      myintrestsid_id_array:myintrestsid_id_array})
   
   }else{
     res.redirect('/myaccount')
   }
+
+  //console.log(myintrestsid_id_array)
   
-  
+   
 }) 
 
 
 
-router.post('/sendintrest',async(req,res)=>{  
+router.post('/sendintrest',async(req,res)=>{ 
+
   
-  db.get().collection('userinfo').updateOne(  
-    {loginid:req.body.loginid},
+  let ifpresent = await db.get().collection('userinfo').findOne(
     {
-      $push:{
-        myintrests:{
-          userid:ObjectId(req.body.request_to),
-          accepted:false  
-        }
+      loginid:req.session.loginid,
+    "myintrests.userid":ObjectId(req.body.request_to)
+  }
+  )
+
+  if(ifpresent){
+    await db.get().collection('userinfo').updateOne(
+      {
+        loginid:req.session.loginid,
+      "myintrests.userid":ObjectId(req.body.request_to)
+    },{
+      $set:{
+        "myintrests.$.declined":false
       }
     }
-  ) 
+    )
+  }else{
+    await db.get().collection('userinfo').updateOne(  
+      {loginid:req.body.loginid},   
+      {
+        $push:{
+          myintrests:{
+            userid:ObjectId(req.body.request_to),
+            accepted:false,
+            declined:false  
+          }
+        }
+      }
+    ) 
+  }
+
  
-  console.log("myintrest:",req.body.request_to)
 
   let data = await  db.get().collection('userinfo').findOne( 
     {loginid:req.body.loginid} 
@@ -316,8 +386,6 @@ router.post('/sendintrest',async(req,res)=>{
       } 
     }
   )
- 
-  console.log("intrested:",userid.toString())  
   
 })
 
@@ -346,8 +414,7 @@ router.post('/acceptrequest',async(req,res)=>{
     curr_user_id = currdata._id
   }
 
-  //console.log("current user",curr_user_id)
-  //console.log("myintrests id",req.body.requested_id)
+  
   
   await db.get().collection('userinfo').updateOne(
     {_id:ObjectId(req.body.requested_id),"myintrests.userid":curr_user_id},
@@ -362,6 +429,45 @@ router.post('/acceptrequest',async(req,res)=>{
 }) 
 
 
+router.post('/declinerequest',async(req,res)=>{
+  await db.get().collection('userinfo').updateOne(
+    {loginid:req.session.loginid},
+    {
+      $pull:{
+        intrested:{userid:ObjectId(req.body.requested_id)}
+      }
+    }
+  )
+
+
+
+  let currdata = await db.get().collection('userinfo').findOne(
+    {
+      loginid:req.session.loginid
+    } 
+  )
+
+  let curr_user_id=''
+  if(currdata){
+    curr_user_id = currdata._id
+  }
+
+  await db.get().collection('userinfo').updateOne(
+    {_id:ObjectId(req.body.requested_id),"myintrests.userid":curr_user_id},
+    {$set:{
+      "myintrests.$.declined":true
+    }}
+  )
+
+  console.log(req.session.loginid)
+  console.log(req.body.requested_id)
+  console.log("deleted")
+
+ 
+ 
+})
+
+
 router.get('/viewprofile/:id',async(req,res)=>{
   console.log(req.params.id)
   let data =await db.get().collection('userinfo').findOne(
@@ -369,30 +475,44 @@ router.get('/viewprofile/:id',async(req,res)=>{
       _id:ObjectId(req.params.id)
     }
   )
-  res.render('layouts/viewprofile',{data:data})
+  res.render('layouts/viewprofile',{data:data,loggedin:req.session.loggedin,username:req.session.username})
 })  
 
 router.post('/search',async(req,res)=>{
   let data = await db.get().collection('userinfo').findOne(
     {
-      name:req.body.search_name
+      name:req.body.search_name 
     }
   )
+
+  let notfind = false
+  let sameuser = false
+  let currdata=''
+
+  if(!data){
+    notfind=true
+  }else if(req.session.loggedin){   
+
+    let currdata = await db.get().collection('userinfo').findOne(
+      {
+        loginid:req.session.loginid
+      }
+    )
   
-  let currdata = await db.get().collection('userinfo').findOne(
-    {
-      loginid:req.session.loginid
+    if(currdata.name==req.body.search_name){
+      sameuser = true
     }
-  )
+  }
+
+
 
 
   let curr_user_id=''
-  if(currdata){
+  if(currdata){    
     curr_user_id = currdata._id 
   }
 
-  //console.log(curr_user_id)
-  //console.log(data)
+
 
   res.render('layouts/home',{
     loggedin:req.session.loggedin,
@@ -400,12 +520,18 @@ router.post('/search',async(req,res)=>{
     loginid:req.session.loginid,
     curr_user_id:curr_user_id,
     searched_data:data,
-    intrested:data.intrested,
+    intrested:notfind ? [] : data.intrested, 
+    sameuser:sameuser,
+    notfind:notfind
   })
+
+  
  
   //res.redirect('/')
 
 })
+
+
 
 
   

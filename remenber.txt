@@ -1,5 +1,28 @@
-validatae the create user form to only get information when all the fileds are filled
+validate the edit profile form so that only accept if all the fileds are fiilled
 
 findOne - toArray() not needed
 
 find - toArray() needed
+
+
+
+1.signup
+2.signin -----
+3.create profile
+4.home page
+
+
+router.get('/',signin)  
+
+user signed in
+
+take login id from logininfo
+save in req.session.loginind
+
+check if userinfo.find({
+    loginid:req.session.loginid
+}) exists ?
+
+if exist res.redirect('/home')
+
+else res.redirect ('/createuser)

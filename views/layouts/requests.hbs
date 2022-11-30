@@ -1,99 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body style="text-align:center;">
 
-<h2>Requests</h2>
-<br>
-<br>
+    <h2>Requests</h2>
+    <br>
+    <br>
 
 
 
-<table style="width:100%;">
-  
-    {{# each requested_users}}
+    <table style="width:100%;">
 
+        {{# each requested_users}}
 
-    <tr>
-        <td>{{this.name}}</td>
-        <td><img src="/userimages/{{this._id}}.jpg" alt="" style="width: 90px;height: 90px;"></td>
-        {{!-- put    '{{this._id}}'   here not    {{this._id}}      --}}
-
-         {{#ifiacceptedornot ../requests_id_array this._id}}
-        {{#if accept}}
-        <td> <button  onclick="acceptrequest('{{../this._id}}')">Accept</button></td>
-        {{/if}}
-        {{#if accepted}}
-        <td><p>accepted</p></td>
-        {{/if}}
-         {{/ifiacceptedornot}} 
-    </tr>
-    <tr></tr>
-    <tr></tr>
-    <tr></tr>
-
-    
-
-    {{/each}}
-
-</table>
-
-<h2>My intrests</h2>
-
-<table style="width:100%;">
-    {{# each intrested_users}}
-   
         <tr>
-               <td>{{this.name}}</td>
-                <td><img src="userimages/{{this._id}}.jpg" alt="" style="width: 90px;height: 90px;" ></td>
-                 {{#ifheacceptedornot this.intrested ../curr_user_id}}
-                 {{#if accepted}}
-                <td><p>accepted</p></td>
-                {{/if}}
-                {{#if accept}}
-                <td><p>Intrest send</p></td>
-                {{/if}}
-                {{/ifheacceptedornot}}
-                <td></td>
-                <td></td>
-                <td></td>
+            
+            <td><img src="/userimages/{{this._id}}.jpg" alt="" style="width: 90px;height: 90px;"></td>
+            {{!-- put '{{this._id}}' here not {{this._id}} --}}
+
+            {{#ifiacceptedornot ../requests_id_array this._id}}
+              {{#if accepted}}
+            <td>
+                    <a href="/viewprofile/{{../this._id}}">
+                            {{../this.name}} 
+                         
+                    </a><br>
+                         {{../this.age}}<br>
+                         {{../this.Education}}
+                    
+            </td>
+            {{else}} 
+            <td>
+                <p>{{../this.name}}</p>
+                 {{../this.age}}<br>
+                {{../this.Education}}
+            </td>
+            {{/if}}
+            {{#if accept}}
+            <td><button onclick="changetextdecline('{{../this._id}}','{{../this._id}}decline') , declinerequest('{{../this._id}}')" id="{{../this._id}}decline">Decline</button></td>
+            <td> <button onclick="acceptrequest('{{../this._id}}') , makedeclineinvisible('{{../this._id}}decline' , '{{../this._id}}')" id="{{../this._id}}"> Accept</button></td>
+            {{/if}}
+            {{#if accepted}}
+            <td>
+                <p>accepted</p>
+            </td>
+            {{/if}}
+            {{/ifiacceptedornot}}
         </tr>
-    
-    {{/each}}
-</table>
+        <tr></tr>
+        <tr></tr>
+        <tr></tr>
+
+
+        {{/each}}
+
+    </table>
+
+    <h2>My intrests</h2>
+
+    <table style="width:100%;">
+        {{# each intrested_users}}
+
+        <tr>
+            <td><img src="userimages/{{this._id}}.jpg" alt="" style="width: 90px;height: 90px;"></td>
+            <td>
+                {{this.name}} <br>
+                {{this.age}}<br>
+                {{this.Education}}
+            </td>
+            {{#ifheacceptedornot ../myintrestsid_id_array this._id}}
+         
+
+            {{#if accepted}}
+            <td>
+                <p>accepted</p>
+            </td>
+            {{/if}}
+
+            {{#if declined}}
+            <td>
+                <p>declined</p>
+            </td>
+            {{/if}}
+
+            {{#if accept}}
+            <td>
+                <p>Intrest send</p>
+            </td>
+  
+            {{/if}}
+            {{/ifheacceptedornot}}
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        {{/each}}
+    </table>
 
 
 
 
 </body>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script>
-           window.onload = function () {
-            var all_buttons = document.querySelectorAll('button');
-            console.log(all_buttons);
-            for (i = 0; i < all_buttons.length; i++) {
-            all_buttons[i].addEventListener('click',function () {
-            this.innerHTML = 'Accepted';
-                    });
-                };
-            };
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+  
+  function changetextdecline(id,id1){
+    document.getElementById(id).style.display='none'
+    document.getElementById(id1).innerHTML='declined'
+  }
 
-            function acceptrequest(id){
-                console.log(id)
-                $.ajax({
-                    url:'/acceptrequest',
-                    data:{
-                        requested_id:id
-                    },
-                    method:'post'
-                })
-            }
+  function makedeclineinvisible(id,id1){
+    document.getElementById(id).style.display='none'
+    document.getElementById(id1).innerHTML='accepted'
+   
+  }
 
-    </script>
+    function acceptrequest(id) {
+      //  console.log(id)
+        $.ajax({
+            url: '/acceptrequest',
+            data: {
+                requested_id: id
+            },
+            method: 'post'
+        })
+    }
+
+
+    function declinerequest(id){     
+       $.ajax({
+            url: '/declinerequest',
+            data: {
+                requested_id: id
+            },
+            method: 'post'
+        })
+    }
+
+</script>
 
 </html>

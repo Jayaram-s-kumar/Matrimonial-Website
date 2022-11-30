@@ -23,7 +23,7 @@
             <label>Name</label>
             <input type="text" name="name" id="name" value="{{partial_data.name}}"><br><br>
             <label for="">Age</label>
-            <input type="text" name="age" id="" value="{{partial_data.age}}"><br><br>
+            <input type="number" name="age" id="" value="{{partial_data.age}}"><br><br>
             <label for="">Fathers name</label>
             <input type="text" name="fathersname" id="" value="{{partial_data.fathersname}}"><br><br>
             <label for="">Mothers name</label>
@@ -78,18 +78,12 @@
             <textarea name="about" id="" cols="30" rows="5">{{partial_data.about}}</textarea><br><br><br>
             
               
-            <button type="submit">Create profile</button>
-                
-             
-
-                
-                
-                <br><br>
+            <button type="submit">Create profile</button>   
+            <br><br>
             <input type="hidden" name="loginid" id="" value={{loginid}}>
-            <input type="hidden" name="intrested" id="" value=[]>
-            <input type="hidden" name="myintrests" id="" value=[]>
         </form>
     </div>
+  
 </body>
 
 

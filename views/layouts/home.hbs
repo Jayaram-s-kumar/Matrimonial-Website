@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,224 +8,211 @@
     <title>Document</title>
 </head>
 <style>
-    h1,h3{
+    h1,
+    h3 {
         text-align: center;
     }
-    button{
-            width: 56px;
-            height: 40px;
+
+    button {
+        width: 56px;
+        height: 40px;
     }
 </style>
+
 <body>
     <h1>Welcome to Just4marry</h1>
 
     <br><br>
     <form action="/search" method="post" style="text-align:center;">
-         <input type="text" name="search_name" id="" placeholder="search profiles">
-         <button type="submit">search</button>
+        <input type="text" name="search_name" id="" placeholder="search profiles">
+        <button type="submit">search</button>
     </form>
     <br><br>
-   
+
 
     {{#if filter}}
-        <br><br>
-        <h3>filterd profiles</h3>
+    <br><br>
+    <h3>filterd profiles</h3>
     {{/if}}
 
     {{#if loggedin}}
-
     {{#if searched_data}}
-    
-        {{#check searched_data.intrested curr_user_id}}
-            {{#if viewprofile}}
+
+    {{#check searched_data.intrested curr_user_id}}
+
+    {{#if viewprofile}}
+    <a href="/viewprofile/{{../searched_data._id}}">
+        <button>View profile</button>
+    </a>
+    {{/if}}
+
+    {{#if intrestsend}}
+    <button>Intrest send</button>
+    {{/if}}
+
+    {{#unless ../sameuser}}
+           {{#if iamintrested}}
+            <button onclick="sendintrest('{{../searched_data._id}}')" class="intrestbtn">I am intrested</button>
+            {{/if}}
+    {{/unless}}
+
+    {{#if ../sameuser}}
             <a href="/viewprofile/{{../searched_data._id}}">
-                 <button>View profile</button>
-            </a>            
-            {{/if}}
-
-            {{#if intrestsend}}
-                <button>Intrest send</button>
-            {{/if}}
-
-            {{#if iamintrested}}
-                  <button onclick="sendintrest('{{../searched_data._id}}')" class="intrestbtn">I am intrested</button>
-            {{/if}}
-         
-        {{/check}}  
+                <button>View profile</button>
+            </a>
+    {{/if}}
 
 
-           <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
-            <img src="userimages/{{searched_data._id}}.jpg" style="width: 191px;height: 247px;" alt="">
-            {{searched_data.name}} <br>
-            {{searched_data.age}} <br>
-            {{searched_data.Education}} <br>
-            {{searched_data.familytype}} <br>
-            {{searched_data.familystatus}} <br>
-            {{searched_data.bodytype}} <br>
-            {{searched_data.complexion}} <br>
-            <br>
-            <br>
-            </div>
+    {{/check}}
+
+
+    <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
+        <img src="userimages/{{searched_data._id}}.jpg" style="width: 191px;height: 247px;" alt="">
+        {{searched_data.name}} <br>
+        {{searched_data.age}} <br>
+        {{searched_data.Education}} <br>
+        {{searched_data.familytype}} <br>
+        {{searched_data.familystatus}} <br>
+        {{searched_data.bodytype}} <br>
+        {{searched_data.complexion}} <br>
+        <br>
+        <br>
+    </div>
 
     {{/if}}
 
+    {{/if}}
+
+    {{#if notfind}}
+        <p>no results</p>
     {{/if}}
 
     {{#unless loggedin}}
 
     {{#if searched_data}}
 
-          <a href="/signin"> 
-                <button>I am intrested</button>
-            </a>
+    <a href="/signin">
+        <button>I am intrested</button>
+    </a>
 
-       <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
-            <img src="userimages/{{searched_data._id}}.jpg" style="width: 191px;height: 247px;" alt="">
-            {{searched_data.name}} <br>
-            {{searched_data.age}} <br>
-            {{searched_data.Education}} <br>
-            {{searched_data.familytype}} <br>
-            {{searched_data.familystatus}} <br>
-            {{searched_data.bodytype}} <br>
-            {{searched_data.complexion}} <br>
-            <br>
-            <br>
-        </div>
+    <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
+        <img src="userimages/{{searched_data._id}}.jpg" style="width: 191px;height: 247px;" alt="">
+        {{searched_data.name}} <br>
+        {{searched_data.age}} <br>
+        {{searched_data.Education}} <br>
+        {{searched_data.familytype}} <br>
+        {{searched_data.familystatus}} <br>
+        {{searched_data.bodytype}} <br>
+        {{searched_data.complexion}} <br> <br>
+     
+        <br>
+        <br>
+    </div>
 
     {{/if}}
 
     {{/unless}}
 
-
-
-
-
-
-
-    
     <div class="container" style="display: flex;width: 100%;justify-content: space-around;margin-top: 50px;">
-         {{#each data}}
+        {{#each data}}
 
-            <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
+        <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
             <img src="userimages/{{this._id}}.jpg" style="width: 191px;height: 247px;" alt="">
             {{this.name}} <br>
             {{this.age}} <br>
-            {{this.Education}} <br>
+            {{this.Education}}
             {{this.familytype}} <br>
             {{this.familystatus}} <br>
             {{this.bodytype}} <br>
-            {{this.complexion}} <br>
+            {{this.complexion}} <br><br>
+         
             <br>
             <br>
-            </div>
+        </div>
 
         {{/each}}
     </div>
 
-
-
-
-    
-
-
-
-
-
-
     <div class="container" style="display: flex;width: 100%;justify-content: space-around;margin-top: 50px;">
 
-     
-
-       
-          
-      
-         {{# each allusers}}
+        {{# each allusers}}
 
         {{#check this.intrested ../curr_user_id}}
-            {{#if viewprofile}}
-            <a href="/viewprofile/{{../this._id}}">
-                 <button>View profile</button>
-            </a>            
-            {{/if}}
+        {{#if viewprofile}}
+        <a href="/viewprofile/{{../this._id}}">
+            <button>View profile</button>
+        </a>
+        {{/if}}
 
-            {{#if intrestsend}}
-                <button>Intrest send</button>
-            {{/if}}
+        {{#if intrestsend}}
+        <button>Intrest send</button>
+        {{/if}}
 
-            {{#if iamintrested}}
-                {{#if ../../loggedin}}
-                    {{log "id is"}}
-                    {{log ../this._id}}
-                  <button onclick="sendintrest('{{../this._id}}')" class="intrestbtn">I am intrested</button>
-                {{else}}
-                <a href="/signin"> 
-                     <button>I am intrested</button>
-                </a>
-                {{/if}}
-            {{/if}}
+        {{#if iamintrested}}
+        {{#if ../../loggedin}}
+        {{#if ../../acc_created}}
+        <button onclick="sendintrest('{{../this._id}}')" class="intrestbtn">I am intrested</button>
+        {{else}}
+        <a href="/myaccount">
+             <button>Create your profile to send intrest</button>
+        </a>
+        {{/if}}     
+        {{else}}
+        <a href="/signin">
+            <button>I am intrested</button>
+        </a>
+        {{/if}}
+        {{/if}}
 
-  
-        {{/check}} 
 
- 
-   
-      
-        
+        {{/check}}
 
-            <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">                     
-                <img src="userimages/{{this._id}}.jpg" alt="" style="width: 191px;height: 247px;"><br>          
-                {{this.name}} <br>
-                {{this.age}} <br>
-                {{this.Education}} <br>
-                {{this.familytype}} <br>
-                {{this.familystatus}} <br>
-                {{this.bodytype}}<br>
-                {{this.complexion}}<br>             
-            </div>
-
-        
+        <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
+            <img src="userimages/{{this._id}}.jpg" alt="" style="width: 191px;height: 247px;"><br>
+            {{this.name}} <br>
+            {{this.age}} <br> 
+            {{this.Education}}
+            {{this.familytype}} <br>
+            {{this.familystatus}} <br>
+            {{this.bodytype}} <br>
+            {{this.complexion}} <br> <br>
            
-          {{/each}}
+        </div>
 
-          <script>
-         
+        {{/each}}
+
+        <script>
+
             window.onload = function () {
-            var all_buttons = document.getElementsByClassName('intrestbtn');
-            console.log(all_buttons);
-            for (i = 0; i < all_buttons.length; i++) {
-            all_buttons[i].addEventListener('click',function () {
-            this.innerHTML = 'intrested';
+                var all_buttons = document.getElementsByClassName('intrestbtn');
+                console.log(all_buttons);
+                for (i = 0; i < all_buttons.length; i++) {
+                    all_buttons[i].addEventListener('click', function () {
+                        this.innerHTML = 'intrested';
                     });
                 };
             };
 
-            function sendintrest(id){
+            function sendintrest(id) {
                 const loginid = "{{loginid}}"
                 const request_to = id
-                //console.log(loginid)
-                //console.log(request_to)
                 $.ajax({
-                    url:'/sendintrest',
-                    data:{
-                        loginid:loginid,
-                        request_to:request_to
+                    url: '/sendintrest',
+                    data: {
+                        loginid: loginid,
+                        request_to: request_to
                     },
-                    method:'post'
+                    method: 'post'
                 })
             }
-          </script>
+        </script>
 
-       
+
     </div>
 
 
-
-
-   
-
-
-  
- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
 </body>
+
 </html>
