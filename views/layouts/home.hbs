@@ -33,9 +33,47 @@
     {{#if filter}}
     <br><br>
     <h3>filterd profiles</h3>
+
+        {{#each data}}
+
+        {{#check this.intrested ../curr_user_id}}
+
+
+        {{#if viewprofile}}
+            <a href="/viewprofile/{{../this._id}}">
+                <button>View profile</button>
+            </a>
+        {{/if}}
+
+        {{#if intrestsend}}
+            <button>Intrest send</button>
+        {{/if}}
+
+        
+           {{#if iamintrested}}
+            <button onclick="sendintrest('{{../this._id}}')" class="intrestbtn">I am intrested</button>
+            {{/if}}
+        
+
+        {{/check}}
+
+        <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
+        <img src="userimages/{{this._id}}.jpg" style="width: 191px;height: 247px;" alt="">
+        {{this.name}} <br>
+        {{this.age}} <br>
+        {{this.Education}} <br>
+        {{this.familytype}} <br>
+        {{this.familystatus}} <br>
+        {{this.bodytype}} <br>
+        {{this.complexion}} <br>
+        <br>
+        <br>
+        </div>
+
+        {{/each}}
     {{/if}}
 
-    {{#if loggedin}}
+
     {{#if searched_data}}
 
     {{#check searched_data.intrested curr_user_id}}
@@ -81,57 +119,13 @@
 
     {{/if}}
 
-    {{/if}}
+ 
 
     {{#if notfind}}
         <p>no results</p>
     {{/if}}
 
-    {{#unless loggedin}}
 
-    {{#if searched_data}}
-
-    <a href="/signin">
-        <button>I am intrested</button>
-    </a>
-
-    <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
-        <img src="userimages/{{searched_data._id}}.jpg" style="width: 191px;height: 247px;" alt="">
-        {{searched_data.name}} <br>
-        {{searched_data.age}} <br>
-        {{searched_data.Education}} <br>
-        {{searched_data.familytype}} <br>
-        {{searched_data.familystatus}} <br>
-        {{searched_data.bodytype}} <br>
-        {{searched_data.complexion}} <br> <br>
-     
-        <br>
-        <br>
-    </div>
-
-    {{/if}}
-
-    {{/unless}}
-
-    <div class="container" style="display: flex;width: 100%;justify-content: space-around;margin-top: 50px;">
-        {{#each data}}
-
-        <div class="cards" style="display: flex;width: 50%;justify-content: space-evenly;}">
-            <img src="userimages/{{this._id}}.jpg" style="width: 191px;height: 247px;" alt="">
-            {{this.name}} <br>
-            {{this.age}} <br>
-            {{this.Education}}
-            {{this.familytype}} <br>
-            {{this.familystatus}} <br>
-            {{this.bodytype}} <br>
-            {{this.complexion}} <br><br>
-         
-            <br>
-            <br>
-        </div>
-
-        {{/each}}
-    </div>
 
     <div class="container" style="display: flex;width: 100%;justify-content: space-around;margin-top: 50px;">
 
@@ -149,19 +143,7 @@
         {{/if}}
 
         {{#if iamintrested}}
-        {{#if ../../loggedin}}
-        {{#if ../../acc_created}}
-        <button onclick="sendintrest('{{../this._id}}')" class="intrestbtn">I am intrested</button>
-        {{else}}
-        <a href="/myaccount">
-             <button>Create your profile to send intrest</button>
-        </a>
-        {{/if}}     
-        {{else}}
-        <a href="/signin">
-            <button>I am intrested</button>
-        </a>
-        {{/if}}
+        <button onclick="sendintrest('{{../this._id}}')" class="intrestbtn">I am intrested</button> 
         {{/if}}
 
 

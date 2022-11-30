@@ -14,42 +14,43 @@ const verifylogin = (req,res,next)=>{
 
 /* GET home page. */
 router.get('/', async function(req,res){
-  if(req.session.loggedin){
-    let acc_created = await db.get().collection('userinfo').findOne({
-      loginid:req.session.loginid
-    })
-    if(acc_created){
-      req.session.acc_created=true
-    }else{
-      req.session.acc_created=false
-    }
-  }
-  let allusers =await db.get().collection("userinfo").find(
-    {loginid:{
-      $nin:[req.session.loginid]
-    }}
-  ).toArray()
+  // if(req.session.loggedin){
+  //   let acc_created = await db.get().collection('userinfo').findOne({
+  //     loginid:req.session.loginid
+  //   })
+  //   if(acc_created){
+  //     req.session.acc_created=true
+  //   }else{
+  //     req.session.acc_created=false
+  //   }
+  // }
+  // let allusers =await db.get().collection("userinfo").find(
+  //   {loginid:{
+  //     $nin:[req.session.loginid]
+  //   }}
+  // ).toArray()
 
-  let currdata = await db.get().collection('userinfo').findOne(
-    {
-      loginid:req.session.loginid
-    } 
-  )     
+  // let currdata = await db.get().collection('userinfo').findOne(
+  //   {
+  //     loginid:req.session.loginid
+  //   } 
+  // )     
  
-  let curr_user_id=''
-  if(currdata){
-    curr_user_id = currdata._id 
-  }
+  // let curr_user_id=''
+  // if(currdata){
+  //   curr_user_id = currdata._id 
+  // }
 
-  res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers,loginid:req.session.loginid,curr_user_id:curr_user_id,acc_created:req.session.acc_created})
-  console.log(req.session)
+  // res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,allusers:allusers,loginid:req.session.loginid,curr_user_id:curr_user_id,acc_created:req.session.acc_created})
+  // console.log(req.session)
+  res.render('layouts/signin')
 });          
 
 
 
-router.get('/signin',verifylogin,(req,res)=>{
-  res.render('layouts/signin')
-})
+// router.get('/signin',verifylogin,(req,res)=>{
+//   res.render('layouts/signin')
+// })
 
 
 router.get('/signup',(req,res)=>{
@@ -76,7 +77,9 @@ router.post('/signin',async(req,res)=>{
       req.session.username=user.name
       req.session.loggedin=true
       req.session.loginid=user._id
-      res.redirect('/')
+     
+      res.redirect('/home')
+
     }else{
       console.log("incorrect password")
       res.render('layouts/signin',{passErr:"incorrect password"})
@@ -89,6 +92,39 @@ router.post('/signin',async(req,res)=>{
 })
 
 
+router.get('/home',verifylogin,async(req,res)=>{
+  let ifprofile = await db.get().collection('userinfo').findOne({
+    loginid:req.session.loginid.toString()
+  })
+  if(ifprofile){
+       let allusers =await db.get().collection("userinfo").find({
+        loginid:{
+           $nin:[req.session.loginid]
+        }
+        }).toArray()
+
+        let currdata = await db.get().collection('userinfo').findOne({
+            loginid:req.session.loginid
+        })     
+ 
+        let curr_user_id=''
+        if(currdata){
+          curr_user_id = currdata._id 
+        }
+
+    res.render('layouts/home',{
+      loginid:req.session.loginid,
+      loggedin:req.session.loggedin,
+      username:req.session.username,
+      allusers:allusers,
+      curr_user_id:curr_user_id,
+      })
+  }else{
+    res.redirect('/myaccount')
+  }
+})
+
+
 
 
 router.get('/logout',(req,res)=>{
@@ -97,21 +133,14 @@ router.get('/logout',(req,res)=>{
 })
   
 router.get('/myaccount',async(req,res)=>{
-  
-    console.log(req.session)
-   
-    if(req.session.loggedin){
-      let data =await db.get().collection('userinfo').findOne({loginid:req.session.loginid})
-     
+
+      let data =await db.get().collection('userinfo').findOne({loginid:req.session.loginid})   
       if(data){
-        res.render("layouts/myprofile",{loggedin:req.session.loggedin,username:req.session.username,userdata:data,imagename:data._id.toString()})
-   
+        res.render("layouts/myprofile",{loggedin:req.session.loggedin,username:req.session.username,userdata:data,imagename:data._id.toString()})  
       }else{
       res.render('layouts/create_user',{loginid:req.session.loginid,loggedin:req.session.loggedin,username:req.session.username})
       }
-    }else{
-      res.redirect('/signin')
-    }
+  
 })  
 
 
@@ -221,8 +250,16 @@ router.post('/edit/:id',async (req,res)=>{
  
 })
 
-router.get('/filter',verifylogin,(req,res)=>{
-  res.render("layouts/filter",{loggedin:req.session.loggedin,username:req.session.username})
+router.get('/filter',verifylogin,async(req,res)=>{
+  let data =await db.get().collection('userinfo').findOne({
+    loginid:req.session.loginid.toString()
+  })
+  console.log(data)
+  if(data){
+    res.render("layouts/filter",{loggedin:req.session.loggedin,username:req.session.username})
+  }else{
+    res.redirect('/myaccount')
+  } 
 })
 
 router.post('/filter',async (req,res)=>{
@@ -235,6 +272,7 @@ router.post('/filter',async (req,res)=>{
   const lower = req.body.lowerage ? req.body.lowerage : 0
   const higer = req.body.higherage ? req.body.higherage : 200
 
+  
  let array=[]
  for(i=lower;i<higer;i++){
    array[i]=i.toString()
@@ -250,6 +288,16 @@ router.post('/filter',async (req,res)=>{
     bodytype:{$in:bodytype_data},
     complexion:{$in:complexion_data}
    }).toArray()
+
+   
+   let currdata = await db.get().collection('userinfo').findOne({
+    loginid:req.session.loginid
+    })     
+
+  let curr_user_id=''
+  if(currdata){
+    curr_user_id = currdata._id 
+  }
   
   console.log("lower",lower,"higer",higer)
   console.log(edu_data)
@@ -259,7 +307,15 @@ router.post('/filter',async (req,res)=>{
   console.log(complexion_data)
   console.log(filereddata)
 
-  res.render('layouts/home',{loggedin:req.session.loggedin,username:req.session.username,filter:true,data:filereddata})
+  console.log(filereddata)
+
+  res.render('layouts/home',{
+    loggedin:req.session.loggedin,
+    username:req.session.username,
+    curr_user_id:curr_user_id,
+    loginid:req.session.loginid,
+    filter:true,
+    data:filereddata})
   
 }) 
 
@@ -367,12 +423,11 @@ router.post('/sendintrest',async(req,res)=>{
   }
 
  
-
   let data = await  db.get().collection('userinfo').findOne( 
-    {loginid:req.body.loginid} 
+    {loginid:req.body.loginid.toString()} 
   )
 
-  //use findone and don't use toArray()
+  console.log(req.body)
 
   const userid = data._id
   db.get().collection('userinfo').updateOne(
